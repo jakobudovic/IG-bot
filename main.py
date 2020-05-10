@@ -139,16 +139,19 @@ class InstaBot:
         print("\nNumber of new likes for the user", user, new_likes, "!\n")
 
 
-bot = InstaBot("sadclown2005", pw)
+# bot = InstaBot("sadclown2005", pw)
+bot = InstaBot("plugwalk2005", pw)
 
-users1 = ["plugwalk2005", "jakobudovic", "rokcaserman",
-          "davidtrafela", "pek1aj", "plugwalk2005", "tilen_miklavic"]
+# users1 = ["plugwalk2005", "jakobudovic", "rokcaserman",
+#           "davidtrafela", "pek1aj", "plugwalk2005", "tilen_miklavic"]
+
+users = ["xzylamanmewborn"]
 
 # bot.search_user("ogloc42069")
 # bot.like_posts("ogloc42069")
 
 
-for user in users1:
+for user in users:
     if bot.search_user(user):
         print("\n---------------------------------")
         print("Liking ", user, "'s posts...")
