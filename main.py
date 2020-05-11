@@ -84,11 +84,9 @@ class InstaBot:
             print("Unable to find number of posts: ", e)
 
     def find_first_post(self):
-        wait = WebDriverWait(self.driver, 10)
-
         try:
             # try classes: eLAPa, KL4Bh, _9AhH0, FFVAD
-            first_post = wait.until(EC.visibility_of_element_located(
+            first_post = self.wait.until(EC.visibility_of_element_located(
                 # (By.XPATH, "/html/body/div[1]/section/main/div/div[2]/article/div/div/div[1]/div[1]")))
                 (By.CLASS_NAME, "_9AhH0")))
             return first_post
@@ -106,7 +104,7 @@ class InstaBot:
     def like_posts(self, user):
         # self.wait_for_the_right_user(user)
         num_posts = self.find_num_posts()
-        if num_posts > 0:
+        if num_posts is not None and num_posts > 0:
             first_post = self.find_first_post()
         else:
             return
@@ -138,25 +136,83 @@ class InstaBot:
                     Keys.ESCAPE).perform()
         print("\nNumber of new likes for the user", user, new_likes, "!\n")
 
+    def my_profile(self):
+        my_icon = self.wait.until(EC.visibility_of_element_located(
+            (By.XPATH, "//a[@href=\"/{}/\"]".format(self.username))))
+        my_icon.click()
 
-# bot = InstaBot("sadclown2005", pw)
-bot = InstaBot("plugwalk2005", pw)
+    def unfollow(self, me, cool_users):
+        self.my_profile()
+
+        following_btn = self.wait.until(EC.visibility_of_element_located(
+            (By.XPATH, "//a[@href=\"/{}/following/\"]".format(self.username))))
+        following_btn.click()
+        # TODO
+
+    def get_unfollowers(self):
+        self.my_profile()
+        sleep(2)
+        self.driver.find_element_by_xpath("//a[contains(@href,'/following')]")\
+            .click()
+        following = self._get_names()
+        self.driver.find_element_by_xpath("//a[contains(@href,'/followers')]")\
+            .click()
+        followers = self._get_names()
+        not_following_back = [
+            user for user in following if user not in followers]
+        print(not_following_back)
+
+    def _get_names(self):
+        sleep(2)
+        names = []
+        # try:
+        """sugs = self.wait.until(EC.visibility_of_element_located(self.driver.find_element_by_xpath(
+                '//h4[contains(text(), Suggestions)]')))
+            self.driver.execute_script('arguments[0].scrollIntoView()', sugs)"""
+        # except Exception as e:
+        sleep(2)
+        scroll_box = self.wait.until(EC.visibility_of_element_located(
+            (By.CLASS_NAME, "PZuss")))
+        #    "/html/body/div[3]/div/div[2]")
+        last_ht, ht = 0, 1
+        while last_ht != ht:
+            last_ht = ht
+            sleep(1)
+            ht = self.driver.execute_script("""
+                arguments[0].scrollTo(0, arguments[0].scrollHeight); 
+                return arguments[0].scrollHeight;
+                """, scroll_box)
+        links = scroll_box.find_elements_by_tag_name('a')
+        names = [name.text for name in links if name.text != '']
+        # close button
+        close_btn = self.wait.until(EC.visibility_of_element_located(
+            (By.CSS_SELECTOR, "div>button>svg")))
+        # close_btn = self.wait.until(EC.visibility_of_element_located(
+        #                             (By.CLASS_NAME, "wpO6b ")))
+        close_btn.click()
+        return names
+
+
+me = "plugwalk2005"
+bot = InstaBot(me, pw)
 
 # users1 = ["plugwalk2005", "jakobudovic", "rokcaserman",
 #           "davidtrafela", "pek1aj", "plugwalk2005", "tilen_miklavic"]
 
-users = ["xzylamanmewborn"]
+users = ["theinsignianow"]
+cool_people = ["jakobudovic", "wrongcountryfool"]
 
-# bot.search_user("ogloc42069")
-# bot.like_posts("ogloc42069")
+# bot.unfollow(me, cool_people)
+bot.get_unfollowers()
 
-
+"""
 for user in users:
     if bot.search_user(user):
         print("\n---------------------------------")
         print("Liking ", user, "'s posts...")
         bot.like_posts(user)
     else:
-        print("Skipping", user)
+        print("Skipping.", user, "was not found.")
+"""
 
 # print("all users covered!")
