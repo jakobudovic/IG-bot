@@ -137,6 +137,7 @@ class InstaBot:
         print("\nNumber of new likes for the user", user, new_likes, "!\n")
 
     def my_profile(self):
+        sleep(1)
         my_icon = self.wait.until(EC.visibility_of_element_located(
             (By.XPATH, "//a[@href=\"/{}/\"]".format(self.username))))
         my_icon.click()
@@ -152,28 +153,30 @@ class InstaBot:
     def get_unfollowers(self):
         self.my_profile()
         sleep(2)
-        self.driver.find_element_by_xpath("//a[contains(@href,'/following')]")\
+        self.driver.find_element_by_xpath("//a[contains(@href,'/followers')]")\
             .click()
         following = self._get_names()
-        self.driver.find_element_by_xpath("//a[contains(@href,'/followers')]")\
+        self.driver.find_element_by_xpath("//a[contains(@href,'/following')]")\
             .click()
         followers = self._get_names()
         not_following_back = [
             user for user in following if user not in followers]
         print(not_following_back)
+        return not_following_back
 
     def _get_names(self):
         sleep(2)
         names = []
+
         # try:
         """sugs = self.wait.until(EC.visibility_of_element_located(self.driver.find_element_by_xpath(
                 '//h4[contains(text(), Suggestions)]')))
             self.driver.execute_script('arguments[0].scrollIntoView()', sugs)"""
         # except Exception as e:
         sleep(2)
+
         scroll_box = self.wait.until(EC.visibility_of_element_located(
-            (By.CLASS_NAME, "PZuss")))
-        #    "/html/body/div[3]/div/div[2]")
+                                     (By.CLASS_NAME, "isgrP")))
         last_ht, ht = 0, 1
         while last_ht != ht:
             last_ht = ht
@@ -182,13 +185,16 @@ class InstaBot:
                 arguments[0].scrollTo(0, arguments[0].scrollHeight); 
                 return arguments[0].scrollHeight;
                 """, scroll_box)
+
+        # "jSC57  _6xe7A"
+
         links = scroll_box.find_elements_by_tag_name('a')
         names = [name.text for name in links if name.text != '']
+        # print(names)
         # close button
         close_btn = self.wait.until(EC.visibility_of_element_located(
-            (By.CSS_SELECTOR, "div>button>svg")))
-        # close_btn = self.wait.until(EC.visibility_of_element_located(
-        #                             (By.CLASS_NAME, "wpO6b ")))
+            (By.XPATH, "/html/body/div[4]/div/div[1]/div/div[2]")))
+
         close_btn.click()
         return names
 
@@ -203,7 +209,7 @@ users = ["theinsignianow"]
 cool_people = ["jakobudovic", "wrongcountryfool"]
 
 # bot.unfollow(me, cool_people)
-bot.get_unfollowers()
+unfollowers = bot.get_unfollowers()
 
 """
 for user in users:
