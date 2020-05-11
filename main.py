@@ -7,6 +7,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 # for escape and such
 from selenium.webdriver.common.keys import Keys
+import time
 
 
 class InstaBot:
@@ -31,9 +32,12 @@ class InstaBot:
         el.click()
 
         # waiting on the popup "Not now"
-        el = self.wait.until(EC.visibility_of_element_located(
-            (By.XPATH, '//button[contains(text(), \'Not Now\')]')))
-        el.click()
+        try:
+            el = self.wait.until(EC.visibility_of_element_located(
+                (By.XPATH, '//button[contains(text(), \'Not Now\')]')))
+            el.click()
+        except Exception as e:
+            print("No 'Not Now' button found!")
 
     def search_user(self, user):
         # wait = WebDriverWait(self.driver, 25)
@@ -153,10 +157,10 @@ class InstaBot:
     def get_unfollowers(self):
         self.my_profile()
         sleep(2)
-        self.driver.find_element_by_xpath("//a[contains(@href,'/followers')]")\
+        self.driver.find_element_by_xpath("//a[contains(@href,'/following')]")\
             .click()
         following = self._get_names()
-        self.driver.find_element_by_xpath("//a[contains(@href,'/following')]")\
+        self.driver.find_element_by_xpath("//a[contains(@href,'/followers')]")\
             .click()
         followers = self._get_names()
         not_following_back = [
@@ -199,7 +203,10 @@ class InstaBot:
         return names
 
 
+start_time = time.time()
+
 me = "plugwalk2005"
+# me = "jakobudovic"
 bot = InstaBot(me, pw)
 
 # users1 = ["plugwalk2005", "jakobudovic", "rokcaserman",
@@ -210,6 +217,18 @@ cool_people = ["jakobudovic", "wrongcountryfool"]
 
 # bot.unfollow(me, cool_people)
 unfollowers = bot.get_unfollowers()
+"""
+unfollowers = ['annaklinski', 'beetlepimp', 'cloutmass', 'ogreen99', 'librarymacabre', 'bruhper', 'bangerbuddy', 'kuwambo', 'edp445daily', 'ogloc42069', 'killingdig', 'vozzey', 'realquornhub', 'shpitpost', 'cocaineape', 'avarosehi', '_colebennett_', 'radboudinternationalstudents', 'future', 'kevinflynnnnnnnnnnnnnn', 'deddstar', 'thuggerthugger1', 'klowt', 'bbnomula', 'nut.mov', 'thereallilmar', 'programmer.me', 'painful_memes.v2', 'thegrilledchez', 'dankmemesgang', 'adam22', 'yungcaterpillar.vhs', 'memezar', 'ted',
+               'dybearpooh', 'whitepeoplehumor', 'nut', 'lilpump', 'h3h3product'
+               'ions', 'i_have_no_memes96_v2', 'mkbhd']
+"""
+
+f = open('unfollowers_meme_page.txt', 'w')
+for unfollower in unfollowers:
+    f.write(unfollower + '\n')
+f.write('\nlen:' + str(len(unfollowers)) + '\n')
+
+f.close()
 
 """
 for user in users:
@@ -222,3 +241,4 @@ for user in users:
 """
 
 # print("all users covered!")
+print("--- %s seconds ---" % (time.time() - start_time))
